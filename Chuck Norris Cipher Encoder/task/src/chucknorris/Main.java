@@ -6,20 +6,35 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-
         Scanner scan = new Scanner(System.in);
-        System.out.println("Input string: ");
-        String str = scan.nextLine();
-        System.out.println("The result:");
-        System.out.println(getDigital(str));
-        //StringBuilder unitSequence = new StringBuilder();
-//        for (int i = 0; i < str.length(); i++) {
-//            String binarySequence = String.format("%07d", Integer.parseInt(getBin(str.charAt(i))));
-//            //System.out.println(binarySequence);
-//            unitSequence.append(binarySequence);
-//            }
-//        System.out.print(getBinaryCyfrated(String.valueOf(unitSequence)));
-//        }
+        while (true) {
+            System.out.println("Please input operation (encode/decode/exit):");
+            String operation = scan.nextLine();
+            if (operation.equals("encode")) {
+                System.out.println("Input string: ");
+                String str = scan.nextLine();
+                StringBuilder unitSequence = new StringBuilder();
+                for (int i = 0; i < str.length(); i++) {
+                    String binarySequence = String.format("%07d", Integer.parseInt(getBin(str.charAt(i))));
+                    unitSequence.append(binarySequence);
+                }
+
+                System.out.println(getBinaryCyfrated(String.valueOf(unitSequence)));
+                System.out.println();
+            }else if (operation.equals("decode")) {
+                System.out.println("Input encoded string:");
+                String str = scan.nextLine();
+
+                System.out.println(getDigital(str));
+                System.out.println();
+            } else if (operation.equals("exit")) {
+                System.out.println("Bye!");
+                break;
+            }else {
+                System.out.println(String.format("There is no '%s' operation", operation));
+                System.out.println();
+            }
+        }
     }
 
     public static String getBin(char charecter) {
@@ -65,23 +80,52 @@ public class Main {
 
         }
         zeroEncripted.deleteCharAt(zeroEncripted.length() - 1);
+        System.out.println("Encoded string:");
         return zeroEncripted.toString();
     }
 
     public static String getDigital(String str) {
         StringBuilder binaryString = new StringBuilder();
         StringBuilder decoded = new StringBuilder();
+        StringBuilder withoutGaps = new StringBuilder();
         String[] splitArray = str.split(" ");
-        int odd  = 1;
-        for (int i = 0; i < splitArray.length; i += 2) {
-            if (splitArray[i].equals("0")){
-                binaryString.append("1".repeat(splitArray[odd].length()));
-            } else if (splitArray[i].equals("00")) {
-                binaryString.append("0".repeat(splitArray[odd].length()));
+        for (int i = 0; i < splitArray.length; i+=2) {
+            if (splitArray[i].length() > 2) {
+                return "Encoded string is not valid.";
             }
-            odd += 2;
+        }
+        for (String item: splitArray) {
+            withoutGaps.append(item);
+        }
+        String arrayString = Arrays.toString(splitArray);
+        String withoutGapsStr = withoutGaps.toString();
+        char[] arrayChar = new char[withoutGapsStr.length()];
+        for (int i = 0; i < withoutGapsStr.length(); i++ ) {
+            arrayChar[i] = withoutGapsStr.charAt(i);
         }
 
+        for (char item: arrayChar) {
+            if (item != '0') {
+                return "Encoded string is not valid.";
+            }
+        }
+
+        if (splitArray.length % 2 != 0) {
+            return "Encoded string is not valid.";
+        }
+
+
+        for (int i = 0; i < splitArray.length; i += 2) {
+            if (splitArray[i].equals("0")){
+                binaryString.append("1".repeat(splitArray[i+1].length()));
+            } else if (splitArray[i].equals("00")) {
+                binaryString.append("0".repeat(splitArray[i+1].length()));
+            }
+
+        }
+        if (binaryString.length() % 7 != 0) {
+            return "Encoded string is not valid.";
+        }
         int count = 0;
         StringBuilder cmt = new StringBuilder();
         for (int i = 0; i < binaryString.length(); i++) {
@@ -93,6 +137,7 @@ public class Main {
                 count = 0;
             }
         }
+        System.out.println("Decoded string:");
         return decoded.toString();
     }
 
